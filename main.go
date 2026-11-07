@@ -18,6 +18,8 @@ func handleCommand(args []string) string {
 		}
 		// TODO: Return bulk string for PING <message>
 		return "+PONG\r\n"
+	case "ECHO":
+		return encodeBulkString(args[1])
 	}
 
 	return fmt.Sprintf("-ERR unknown command '%s'\r\n", cmd)
