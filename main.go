@@ -9,15 +9,17 @@ import (
 
 func handleCommand(args []string) string {
 	cmd := strings.ToUpper(args[0])
+	argsCount := len(args) - 1
+
+	if isArityValid(cmd, argsCount) {
+		return error(fmt.Sprintf("ERR wrong number of arguments for '%s' command", cmd))
+	}
 
 	switch cmd {
 	case "PING":
-		// TODO: Return "+PONG\r\n" for no args
-		if len(args[1:]) > 0 {
+		if argsCount > 0 {
 			return bulkString(args[1])
 		}
-		// TODO: Return bulk string for PING <message>
-		// return "+PONG\r\n"
 		return simpleString("PONG")
 	case "ECHO":
 		return bulkString(args[1])
@@ -26,6 +28,24 @@ func handleCommand(args []string) string {
 	}
 
 	return error(fmt.Sprintf("ERR unknown command '%s'", cmd))
+}
+
+var arity = map[string][2]int{
+	"PING": {0, 1},
+	"ECHO": {1, 1},
+}
+
+func isArityValid(cmd string, argsCount int) bool {
+
+	value, exists := arity[cmd]
+
+	if !exists {
+		return false
+	}
+	if !(argsCount >= value[0] && argsCount <= value[1]) {
+		return true
+	}
+	return false
 }
 
 func simpleString(s string) string {
@@ -39,7 +59,7 @@ func integer(n int) string {
 }
 func bulkString(s string) string {
 	if len(s) == 0 {
-		return "$-0\r\n"
+		return "$-1\r\n"
 	}
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(s), s)
 }
