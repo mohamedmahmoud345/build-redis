@@ -14,18 +14,33 @@ func handleCommand(args []string) string {
 	case "PING":
 		// TODO: Return "+PONG\r\n" for no args
 		if len(args[1:]) > 0 {
-			return encodeBulkString(args[1])
+			return bulkString(args[1])
 		}
 		// TODO: Return bulk string for PING <message>
-		return "+PONG\r\n"
+		// return "+PONG\r\n"
+		return simpleString("PONG")
 	case "ECHO":
-		return encodeBulkString(args[1])
+		return bulkString(args[1])
+	case "COMMAND":
+		return simpleString("OK")
 	}
 
-	return fmt.Sprintf("-ERR unknown command '%s'\r\n", cmd)
+	return error(fmt.Sprintf("ERR unknown command '%s'", cmd))
 }
 
-func encodeBulkString(s string) string {
+func simpleString(s string) string {
+	return fmt.Sprintf("+%s\r\n", s)
+}
+func error(s string) string {
+	return fmt.Sprintf("-%s\r\n", s)
+}
+func integer(n int) string {
+	return fmt.Sprintf(":%d\r\n", n)
+}
+func bulkString(s string) string {
+	if len(s) == 0 {
+		return "$-0\r\n"
+	}
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(s), s)
 }
 
