@@ -14,7 +14,6 @@ var store = map[string]string{}
 func handleCommand(args []string) string {
 	cmd := strings.ToUpper(args[0])
 	argsCount := len(args) - 1
-
 	if isArityInvalid(cmd, argsCount) {
 		return errorReply(fmt.Sprintf("ERR wrong number of arguments for '%s' command", cmd))
 	}
@@ -38,6 +37,8 @@ func handleCommand(args []string) string {
 			return nullBulk()
 		}
 		return bulkString(v)
+	case "DBSIZE":
+		return integer(len(store))
 	}
 
 	return errorReply(fmt.Sprintf("ERR unknown command '%s'", cmd))
